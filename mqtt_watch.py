@@ -1,4 +1,7 @@
 import paho.mqtt.client as mqtt
+import sqlite
+
+log = sqlite.db('waterwall.db')
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
@@ -6,7 +9,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("#")
 
 def on_message(client, userdata, msg):
-    print(f"{msg.topic} {msg.payload}")
+    log.insert(msg.topic, msg.payload)
 
 client = mqtt.Client()
 client.on_connect = on_connect
