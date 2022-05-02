@@ -51,6 +51,14 @@ class db:
             values (?,?,?,?)''', (n, data, t, t))
         self.con.commit()
 
+    def search(self, topic_text):
+        ret = {}
+        topic_text += '%' # append wildcard
+        query = 'select rowid,topic from topics where topic like :n'
+        for row in self.cur.execute(query,{"n":topic_text}):
+            ret[row[1]] = row[0]
+        return ret
+
 
     def close(self):
         self.con.close()
