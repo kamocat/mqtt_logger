@@ -1,6 +1,7 @@
 import sqlite3
 import time
 import math
+import datetime
 
 class db:
     def __init__ (self, path):
@@ -28,14 +29,15 @@ class db:
             v = self.cur.lastrowid
         return v
 
-    def insert(self, topic, data):
+    def insert(self, topic, data, t='now'):
         try:
             data = float(data)
         except:
             print(f"Could not convert to number: {data}")
             return
         n = self.match_topic(topic)
-        t = time.time()
+        if( t == 'now' ):
+            t = time.time()
         # Check if the value is the same
         self.cur.execute('''select rowid,value from num 
         where topic=:n order by rowid desc''', {'n':n})
@@ -59,14 +61,31 @@ class db:
             ret[row[1]] = row[0]
         return ret
 
+    def fill(self, topic, qty, clear=False):
+        if( clear ):
+            n = self.match_topic(topic)
+            self.cur.execute('delete from num where topic=:n',{'n':n})
+
+        import random as rand
+        rand.seed()
+        x = 0
+        x2 = 0
+        t = time.time()
+        t = round(t)
+        for i in range(qty):
+            if(rand.random() > 0.8):
+                x += rand.uniform(-0.2,0.5)
+            self.insert(topic, math.cos(x), t+i)
+
+    def fetch(self, topic, end_date='now', timespan=60*60*24):
+        n = self.match_topic(topic)
+        x = []
+        y = []
+        for row in self.cur.execute('select start,value from num where topic=:n',{'n':n}):
+            x.append(datetime.datetime.fromtimestamp(row[0]))
+            y.append(row[1])
+        return (x,y)
+
 
     def close(self):
         self.con.close()
-
-
-# Test code
-if __name__ == '__main__':
-    a = db('test.db')
-    #print(a.match_topic("test/one"))
-    a.insert('test/two', '35.3')
-    a.close()
