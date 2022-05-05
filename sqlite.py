@@ -77,11 +77,15 @@ class db:
                 x += rand.uniform(-0.2,0.5)
             self.insert(topic, math.cos(x), t+i)
 
-    def fetch(self, topic, end_date='now', timespan=60*60*24):
+    def fetch(self, topic, end_date=None, timespan=60*60*24):
         n = self.match_topic(topic)
         x = []
         y = []
-        for row in self.cur.execute('select start,value from num where topic=:n',{'n':n}):
+        if(end_date == None):
+            # Get the most recent point
+            self.cur.execute('select end from num where topic=:n order by rowid desc limit 1',{'n':n})
+            end_date = self.cur.fetchone()[0]
+        for row in self.cur.execute('select start,value from num where topic=:n and start<=:s and end>=:e',{'n':n, 's':end_date, 'e':end_date-timespan}):
             x.append(datetime.datetime.fromtimestamp(row[0]))
             y.append(row[1])
         return (x,y)
