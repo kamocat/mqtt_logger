@@ -77,7 +77,8 @@ class db:
                 x += rand.uniform(-0.2,0.5)
             self.insert(topic, math.cos(x), t+i)
 
-    def fetch(self, topic, end_date=None, timespan=60*60*24):
+    def fetch(self, topic, end_date=None, days=1):
+        timespan = days * 60*60*24
         n = self.match_topic(topic)
         points = []
         if(end_date == None):
