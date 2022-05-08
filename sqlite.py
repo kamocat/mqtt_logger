@@ -9,7 +9,7 @@ class db:
         self.cur = self.con.cursor()
         try:
             self.cur.execute('''create table topics
-                (topic varchar(255))''')
+                (id integer primary key asc, topic varchar(255))''')
             self.cur.execute('''create table num
                 (topic int, value real, start timestamp, end timestamp)''')
             self.con.commit()
@@ -17,7 +17,7 @@ class db:
             pass
     def match_topic(self, t):
         # Check if the topic exists
-        self.cur.execute("select rowid from topics where topic=:name",{"name":t})
+        self.cur.execute("select id from topics where topic=:name",{"name":t})
         v = self.cur.fetchone()
         try:
             v = v[0]
@@ -56,7 +56,7 @@ class db:
     def search(self, topic_text):
         ret = {}
         topic_text += '%' # append wildcard
-        query = 'select rowid,topic from topics where topic like :n'
+        query = 'select id,topic from topics where topic like :n'
         for row in self.cur.execute(query,{"n":topic_text}):
             ret[row[1]] = row[0]
         return ret
