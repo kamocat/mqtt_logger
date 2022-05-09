@@ -1,10 +1,3 @@
-<html>
-<script type="module">
-
-import * as d3 from "https://cdn.skypack.dev/d3@7";
-
-const div = d3.selectAll("div");
-
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/area-chart
@@ -87,28 +80,3 @@ function AreaChart(data, {
 
   return svg.node();
 }
-
-const date = new Date();
-const offset = date.getTimezoneOffset() * 60;
-const url = '/points/waterwall/level?days=7';
-fetch(url).then(response => response.json() )
-.then(data => AreaChart(data, {
-  x: d => (d.time - offset) * 1000, //Convert to localtime 
-  y: d => d.value,
-  yLabel: "↑ Value",
-  xLabel: console.log(new Date(data[0].time*1000).toLocaleDateString()),
-  width: 1000,
-  height: 500,
-  color: "steelblue"
-}))
-.then(chart => div.node().append(chart))
-
-</script> 
-    <head><title>graphing test page</title>
-    </head>
-    <body>
-        <h1>Test graph</h1>
-        <div id="plot1">
-        </div>
-    </body>
-</html>
