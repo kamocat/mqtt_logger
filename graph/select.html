@@ -1,10 +1,13 @@
+<!DOCTYPE html>
 <html>
     <head><title>graphing test page</title>
     </head>
     <body>
         <h1>Test graph</h1>
-        <ul id="sidebar" style="float:left; width:20%;
-            background-color:cdd3f1; min-height: 200px; padding:50px;"></ul>
+	<div id="sidebar" style="float:left; border:1px solid gray; padding: 20px;">
+		<h3>Topics</h3>
+		<form id="topics" action="console.log('form action');">
+		</form></div>
         <div id="plot1">
         </div>
     </body>
@@ -15,11 +18,10 @@ var topic = "test/adc";
 //const url = `/points/${topic}?days=${days}`;
 const url = '/topics';
 function radio(data){
-  var list = "";
+  var list = document.getElementById("sidebar");
   for (let x in data){
-    list += `<li>${x}</li>`;
+		  list.innerHTML += `<input type="radio" name="topic" value=${data[x]} onchange="console.log('clicked')"}><label for=${x}>${x}</label><br>`;
   }
-  document.getElementById("sidebar").innerHTML = list;
 }
     
 fetch(url).then(response => response.json() )
