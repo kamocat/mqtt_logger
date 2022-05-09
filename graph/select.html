@@ -1,0 +1,28 @@
+<html>
+    <head><title>graphing test page</title>
+    </head>
+    <body>
+        <h1>Test graph</h1>
+        <ul id="sidebar" style="float:left; width:20%;
+            background-color:cdd3f1; min-height: 200px; padding:50px;"></ul>
+        <div id="plot1">
+        </div>
+    </body>
+</html>
+<script>
+var days = 7;
+var topic = "test/adc";
+//const url = `/points/${topic}?days=${days}`;
+const url = '/topics';
+function radio(data){
+  var list = "";
+  for (let x in data){
+    list += `<li>${x}</li>`;
+  }
+  document.getElementById("sidebar").innerHTML = list;
+}
+    
+fetch(url).then(response => response.json() )
+.then(res => radio(res.topics))
+
+</script> 
