@@ -80,16 +80,16 @@ class db:
     def fetch(self, topic, end_date=None, days=1):
         timespan = days * 60*60*24
         n = self.match_topic(topic)
-        points = []
+        x = []
+        y = []
         if(end_date == None):
             # Get the most recent point
             self.cur.execute('select end from num where topic=:n order by rowid desc limit 1',{'n':n})
             end_date = self.cur.fetchone()[0]
         for row in self.cur.execute('select start,value from num where topic=:n and start<=:s and end>=:e',{'n':n, 's':end_date, 'e':end_date-timespan}):
-            x = row[0]
-            y = row[1]
-            points.append({'time':x, 'value':y})
-        return points
+            x.append(row[0])
+            y.append(row[1])
+        return {"time":x, "value":y}
 
 
     def close(self):

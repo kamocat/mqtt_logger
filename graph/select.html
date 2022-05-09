@@ -36,10 +36,8 @@ function fetch_data(){
 	const offset = date.getTimezoneOffset() * 60;
 	fetch(url).then(response => response.json() )
 	.then(data => AreaChart(data, {
-		x: d => (d.time - offset) * 1000, //Convert to localtime 
-		y: d => d.value,
 		yLabel: "↑ Value",
-		xLabel: console.log(new Date(data[0].time*1000).toLocaleDateString()),
+		xLabel: "Time",
 		width: 1000,
 		height: 500,
 		color: "steelblue"

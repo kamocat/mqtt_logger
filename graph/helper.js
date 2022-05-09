@@ -2,8 +2,6 @@
 // Released under the ISC license.
 // https://observablehq.com/@d3/area-chart
 function AreaChart(data, {
-  x = ([x]) => x, // given d in data, returns the (temporal) x-value
-  y = ([, y]) => y, // given d in data, returns the (quantitative) y-value
   defined, // given d in data, returns true if defined (for gaps)
   curve = d3.curveLinear, // method of interpolation between points
   marginTop = 20, // top margin, in pixels
@@ -23,13 +21,9 @@ function AreaChart(data, {
   color = "currentColor" // fill color of area
 } = {}) {
   // Compute values.
-  const X = d3.map(data, x);
-  const Y = d3.map(data, y);
+  const X = data.time;
+  const Y = data.value;
   const I = d3.range(X.length);
-
-  // Compute which data points are considered defined.
-  if (defined === undefined) defined = (d, i) => !isNaN(X[i]) && !isNaN(Y[i]);
-  const D = d3.map(data, defined);
 
   // Compute default domains.
   if (xDomain === undefined) xDomain = d3.extent(X);
@@ -43,7 +37,6 @@ function AreaChart(data, {
 
   // Construct an area generator.
   const area = d3.line()
-      .defined(i => D[i])
       .curve(curve)
       .x(i => xScale(X[i]))
       .y(i => yScale(Y[i]));
