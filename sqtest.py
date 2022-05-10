@@ -1,8 +1,8 @@
 import sqlite
-a = sqlite.db('test.db')
+a = sqlite.db('waterwall.db')
 
-a.fill('test/random', 500, True)
-data = a.fetch('test/random', timespan=100)
-print(data)
-
+a.fill('test/random1', 100)
+a.fill('test/random2', 200)
+a.fill('test/random3', 500)
+a.fill('test/random4', 1000)
 a.close()
