@@ -25,14 +25,12 @@ function radio(data){
   }
 }
     
-fetch('/topics').then(response => response.json() )
+fetch('/topics/').then(response => response.json() )
 .then(res => radio(res.topics))
 
 function fetch_data(){
   const controls = document.forms['controls'];
 	let url = "/points/" + controls["topic"].value + "?days=" + controls["days"].value;
-	const date = new Date();
-	const offset = date.getTimezoneOffset() * 60;
 	fetch(url).then(response => response.json() )
 	.then(data => AreaChart(data, {
 		yLabel: "↑ Value",

@@ -19,7 +19,6 @@ function AreaChart(data, {
   yFormat, // a format specifier string for the y-axis
   yLabel, // a label for the y-axis
   color = "currentColor", // fill color of area
-  redraw = false,
   id= "div",
 } = {}) {
   // Compute values.
@@ -44,9 +43,21 @@ function AreaChart(data, {
       .y(i => yScale(Y[i]));
 
 	let div = d3.select(id);
-	if(redraw){
+	if(AreaChart.didrun){
+		div = div.transition();
+		div.select(".line")
+			.duration(750)
+			.attr("d", area(I))
+		div.select(".y.axis")
+			.duration(750)
+			.call(yAxis)
+		div.select(".x.axis")
+			.duration(750)
+			.call(xAxis);
+			
 		
 	} else {
+		AreaChart.didrun = true;
 		const svg = d3.create("svg")
 				.attr("width", width)
 				.attr("height", height)
