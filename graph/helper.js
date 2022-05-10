@@ -46,8 +46,8 @@ function AreaChart(data, {
 	if(AreaChart.didrun){
 		div = div.transition().duration(750);
 		div.select(".line").attr("d", area(I));
-		div.select(".x.axis").call(xAxis);
-		div.select(".y.axis").call(yAxis);
+		div.select(".yaxis").call(yAxis);
+		div.select(".xaxis").call(xAxis);
 	} else {
 		AreaChart.didrun = true;
 		const svg = d3.create("svg")
@@ -57,7 +57,7 @@ function AreaChart(data, {
 				.attr("style", "max-width: 100%; height: auto; height: intrinsic;");
 
 		svg.append("g")
-				.attr("class", "y.axis")
+				.attr("class", "yaxis")
 				.attr("transform", `translate(${marginLeft},0)`)
 				.call(yAxis)
 				.call(g => g.select(".domain").remove())
@@ -79,7 +79,7 @@ function AreaChart(data, {
 				.attr("stroke-width", 1.5);
 
 		svg.append("g")
-				.attr("class", "x.axis")
+				.attr("class", "xaxis")
 				.attr("transform", `translate(0,${height - marginBottom})`)
 				.call(xAxis);
 
