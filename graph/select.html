@@ -29,7 +29,6 @@ fetch('/topics').then(response => response.json() )
 .then(res => radio(res.topics))
 
 function fetch_data(){
-	let mygraph = d3.select("#plot1");
   const controls = document.forms['controls'];
 	let url = "/points/" + controls["topic"].value + "?days=" + controls["days"].value;
 	const date = new Date();
@@ -38,11 +37,11 @@ function fetch_data(){
 	.then(data => AreaChart(data, {
 		yLabel: "↑ Value",
 		xLabel: "Time",
-		width: 1000,
+		width: 600,
 		height: 500,
-		color: "steelblue"
+		color: "steelblue",
+		id: "#plot1",
 	}))
-	.then(chart => mygraph.node().append(chart))
 }
   
 </script> 

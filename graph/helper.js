@@ -10,7 +10,7 @@ function AreaChart(data, {
   marginLeft = 40, // left margin, in pixels
   width = 640, // outer width, in pixels
   height = 400, // outer height, in pixels
-  xType = d3.scaleUtc, // type of x-scale
+  xType = d3.scaleTime, // type of x-scale
   xDomain, // [xmin, xmax]
   xRange = [marginLeft, width - marginRight], // [left, right]
   yType = d3.scaleLinear, // type of y-scale
@@ -18,10 +18,12 @@ function AreaChart(data, {
   yRange = [height - marginBottom, marginTop], // [bottom, top]
   yFormat, // a format specifier string for the y-axis
   yLabel, // a label for the y-axis
-  color = "currentColor" // fill color of area
+  color = "currentColor", // fill color of area
+  redraw = false,
+  id= "div",
 } = {}) {
   // Compute values.
-  const X = data.time;
+  const X = data.time.map(x=>x*1000);
   const Y = data.value;
   const I = d3.range(X.length);
 
@@ -41,35 +43,43 @@ function AreaChart(data, {
       .x(i => xScale(X[i]))
       .y(i => yScale(Y[i]));
 
-  const svg = d3.create("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [0, 0, width, height])
-      .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+	let div = d3.select(id);
+	if(redraw){
+		
+	} else {
+		const svg = d3.create("svg")
+				.attr("width", width)
+				.attr("height", height)
+				.attr("viewBox", [0, 0, width, height])
+				.attr("style", "max-width: 100%; height: auto; height: intrinsic;");
 
-  svg.append("g")
-      .attr("transform", `translate(${marginLeft},0)`)
-      .call(yAxis)
-      .call(g => g.select(".domain").remove())
-      .call(g => g.selectAll(".tick line").clone()
-          .attr("x2", width - marginLeft - marginRight)
-          .attr("stroke-opacity", 0.1))
-      .call(g => g.append("text")
-          .attr("x", -marginLeft)
-          .attr("y", 10)
-          .attr("fill", "currentColor")
-          .attr("text-anchor", "start")
-          .text(yLabel));
+		svg.append("g")
+				.attr("class", ".y.axis")
+				.attr("transform", `translate(${marginLeft},0)`)
+				.call(yAxis)
+				.call(g => g.select(".domain").remove())
+				.call(g => g.selectAll(".tick line").clone()
+						.attr("x2", width - marginLeft - marginRight)
+						.attr("stroke-opacity", 0.1))
+				.call(g => g.append("text")
+						.attr("x", -marginLeft)
+						.attr("y", 10)
+						.attr("fill", "currentColor")
+						.attr("text-anchor", "start")
+						.text(yLabel));
 
-  svg.append("path")
-      .attr("fill", "none")
-      .attr("d", area(I))
-      .attr("stroke", color)
-      .attr("stroke-width", 1.5);
+		svg.append("path")
+				.attr("class", ".line")
+				.attr("fill", "none")
+				.attr("d", area(I))
+				.attr("stroke", color)
+				.attr("stroke-width", 1.5);
 
-  svg.append("g")
-      .attr("transform", `translate(0,${height - marginBottom})`)
-      .call(xAxis);
+		svg.append("g")
+				.attr("class", ".x.axis")
+				.attr("transform", `translate(0,${height - marginBottom})`)
+				.call(xAxis);
 
-  return svg.node();
+		div.node().append(svg.node());
+	}
 }
