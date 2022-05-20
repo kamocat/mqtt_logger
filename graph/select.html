@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="/graph/helper.js"></script>
+<script src="/helper.js"></script>
 <html>
     <head><title>graphing test page</title>
     </head>
@@ -25,12 +25,12 @@ function radio(data){
   }
 }
     
-fetch('/topics/').then(response => response.json() )
+fetch('/api/topics/').then(response => response.json() )
 .then(res => radio(res.topics))
 
 function fetch_data(){
   const controls = document.forms['controls'];
-	let url = "/points/" + controls["topic"].value + "?days=" + controls["days"].value;
+	let url = "/api/points/" + controls["topic"].value + "?days=" + controls["days"].value;
 	fetch(url).then(response => response.json() )
 	.then(data => AreaChart(data, {
 		yLabel: "↑ Value",
