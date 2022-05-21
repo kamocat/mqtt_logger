@@ -85,9 +85,21 @@ function addPlot(data, settings){
 }
 
 function updatePlot(data, settings){
-    svg.select("#"+ data.i)
-            .attr("d", make_line(data,settings))
-            .transition().duration(750);
+    plot = d3.select("#"+ data.i);
+    if( plot.empty() ){
+        addPlot(data, settings);
+    } else {
+        plot
+            .transition().duration(750)
+            .attr("d", make_line(data,settings));
+    }
+}
+
+function updateAll(alldata, settings){
+    updateAxes(data, settings);
+    for (d in alldata){
+        updatePlot(alldata[d], settings);
+    }
 }
 function deletePlot(data, settings){
         d3.select("#"+ data.i).remove();

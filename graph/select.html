@@ -45,12 +45,12 @@ function fetch_data(topic, index){
             return data;
         })
         .then(data => {
-            updateAxes(data, settings);
-            addPlot(data[topic], settings);
+            updateAll(data, settings);
         })
     } else {
         deletePlot(data[topic], settings);
         delete data[topic];
+        updateAll(data, settings);
     }
 }
   
