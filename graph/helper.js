@@ -72,6 +72,7 @@ function AreaChart(data, {
 						.text(yLabel));
 
 		svg.append("path")
+                .attr("id", "#plot1")
 				.attr("class", "line")
 				.attr("fill", "none")
 				.attr("d", area(I))

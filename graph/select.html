@@ -20,36 +20,40 @@
 <script>
 function radio(data){
   var list = document.getElementById("controls");
+  let i = 0;
   for (let x in data){
-		  list.innerHTML += `<input type="checkbox" name="topic" onchange="fetch_data('${x}')"}><label for=${x}>${x}</label><br>`;
+            ++i;
+		  list.innerHTML += `<input type="checkbox" name="plot${i}" onchange="fetch_data('${x}', 'plot${i}')"}><label for=${x}>${x}</label><br>`;
   }
 }
     
 fetch('/api/topics/').then(response => response.json() )
 .then(res => radio(res.topics))
 
-data = {"count":0}
+data = {}
 
-function fetch_data(topic){
+function fetch_data(topic, index){
     const controls = document.forms['controls'];
-	let url = "/api/points/" + topic + "?days=" + controls["days"].value;
-	fetch(url).then(response => response.json() )
-    .then(points => {
-        if(data[topic] == null){
-            data.count++; 
-            points.i=data.count; 
-        }
-        data[topic]=points;
-        return points;
-    })
-	.then(data => AreaChart(data, {
-		yLabel: "↑ Value",
-		xLabel: "Time",
-		width: 600,
-		height: 500,
-		color: "steelblue",
-		id: "#plot1",
-	}))
+    if(controls[index].checked){
+        let url = "/api/points/" + topic + "?days=" + controls["days"].value;
+        fetch(url).then(response => response.json() )
+        .then(points => {
+            points.i=index; 
+            data[topic]=points;
+            return points;
+        })
+        .then(data => AreaChart(data, {
+            yLabel: "↑ Value",
+            xLabel: "Time",
+            width: 600,
+            height: 500,
+            color: "steelblue",
+            id: "#plot1",
+        }))
+    } else {
+        delete data[topic];
+        d3.select("#"+ index).remove();
+    }
 }
   
 </script> 
