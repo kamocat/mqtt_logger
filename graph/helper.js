@@ -40,7 +40,7 @@ function updateAxes(alldata, conf){
                                                                        // Get min and max of x and y for all plots
     x = [];
     y = [];
-    for (d of alldata){
+    for (d in alldata){
         x.push(d3.min(alldata[d].time));
         x.push(d3.max(alldata[d].time));
         y.push(d3.min(alldata[d].value));
@@ -54,21 +54,26 @@ function updateAxes(alldata, conf){
     // Construct scales and axes.
     conf.xScale = d3.scaleTime(xDomain, xRange);
     conf.yScale = d3.scaleLinear(yDomain, yRange);
-    const xAxis = d3.axisBottom(conf.xScale).ticks(width / 80).tickSizeOuter(0);
-    const yAxis = d3.axisLeft(conf.yScale).ticks(height / 40, yFormat);
+    const xAxis = d3.axisBottom(conf.xScale).ticks(conf.width / 80).tickSizeOuter(0);
+    const yAxis = d3.axisLeft(conf.yScale).ticks(conf.height / 40);
 
     svg = d3.select("svg")
     svg = svg.transition().duration(750);
     svg.select(".yaxis").call(yAxis);
     svg.select(".xaxis").call(xAxis);
+
+    // Fix the mapping on x axis
+    xDomain = [d3.min(x), d3.max(x)];
+    conf.xScale = d3.scaleTime(xDomain, xRange);
+    
 }
 function make_line(data, settings){
-    const I = d3.range(X.length);
+    const I = d3.range(data.time.length);
     let line = d3.line()
       .curve(settings.curve)
       .x(i => settings.xScale(data.time[i]))
       .y(i => settings.yScale(data.value[i]));
-    return line(data.time.length);
+    return line(I);
 }
 function addPlot(data, settings){
     d3.select("svg").append("path")
