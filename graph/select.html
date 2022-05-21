@@ -13,7 +13,7 @@
 		<input type="checkbox" onchange="fetch_data()" name="notes"><label name="notes">Show annotations?</label><br>
 		<h3>Topic</h3>
 		</form></div>
-        <div id="#chart">
+        <div id="chart">
         </div>
     </body>
 </html>
@@ -32,7 +32,7 @@ fetch('/api/topics/').then(response => response.json() )
 
 data = {}
 
-InitChart();
+InitChart(settings);
 
 function fetch_data(topic, index){
     const controls = document.forms['controls'];
