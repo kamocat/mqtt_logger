@@ -9,7 +9,7 @@
 	<div id="sidebar" style="float:left; border:1px solid gray; padding: 20px;">
 		<h2>Data</h2>
 		<form id="controls">
-		<input type="number" onchange="fetch_data()" name="days" value=1><label name="days">days</label><br>
+		<input type="number" name="days" value=1><label name="days">days</label><br>
 		<input type="checkbox" onchange="fetch_data()" name="notes"><label name="notes">Show annotations?</label><br>
 		<h3>Topic</h3>
 		</form></div>
@@ -21,17 +21,27 @@
 function radio(data){
   var list = document.getElementById("controls");
   for (let x in data){
-		  list.innerHTML += `<input type="radio" name="topic" value=${x} onchange="fetch_data()"}><label for=${x}>${x}</label><br>`;
+		  list.innerHTML += `<input type="checkbox" name="topic" onchange="fetch_data('${x}')"}><label for=${x}>${x}</label><br>`;
   }
 }
     
 fetch('/api/topics/').then(response => response.json() )
 .then(res => radio(res.topics))
 
-function fetch_data(){
-  const controls = document.forms['controls'];
-	let url = "/api/points/" + controls["topic"].value + "?days=" + controls["days"].value;
+data = {"count":0}
+
+function fetch_data(topic){
+    const controls = document.forms['controls'];
+	let url = "/api/points/" + topic + "?days=" + controls["days"].value;
 	fetch(url).then(response => response.json() )
+    .then(points => {
+        if(data[topic] == null){
+            data.count++; 
+            points.i=data.count; 
+        }
+        data[topic]=points;
+        return points;
+    })
 	.then(data => AreaChart(data, {
 		yLabel: "↑ Value",
 		xLabel: "Time",
