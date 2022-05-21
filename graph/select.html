@@ -13,7 +13,7 @@
 		<input type="checkbox" onchange="fetch_data()" name="notes"><label name="notes">Show annotations?</label><br>
 		<h3>Topic</h3>
 		</form></div>
-        <div id="plot1">
+        <div id="#chart">
         </div>
     </body>
 </html>
@@ -32,6 +32,8 @@ fetch('/api/topics/').then(response => response.json() )
 
 data = {}
 
+InitChart();
+
 function fetch_data(topic, index){
     const controls = document.forms['controls'];
     if(controls[index].checked){
@@ -40,19 +42,15 @@ function fetch_data(topic, index){
         .then(points => {
             points.i=index; 
             data[topic]=points;
-            return points;
+            return data;
         })
-        .then(data => AreaChart(data, {
-            yLabel: "↑ Value",
-            xLabel: "Time",
-            width: 600,
-            height: 500,
-            color: "steelblue",
-            id: "#plot1",
-        }))
+        .then(data => {
+            updateAxes(data, settings);
+            addPlot(data[topic], settings);
+        })
     } else {
+        deletePlot(data[topic], settings);
         delete data[topic];
-        d3.select("#"+ index).remove();
     }
 }
   
