@@ -3,10 +3,14 @@
 <script src="/helper.js"></script>
 <html>
     <head><title>graphing test page</title>
+    <style type="text/css">
+#chart {margin-left: 300px;}
+#sidebar {float: left; border: 1px solid gray; padding: 20px;}
+    </style>
     </head>
     <body>
         <h1>Test graph</h1>
-	<div id="sidebar" style="float:left; border:1px solid gray; padding: 20px;">
+	<div id="sidebar">
 		<h2>Data</h2>
 		<form id="controls">
 		<input type="number" name="days" value=1><label name="days">days</label><br>
@@ -37,7 +41,7 @@ function radio(data){
     let i = 0;
     for (let x in data){
         j = i%colors.length;
-        list.innerHTML += `<input type="checkbox" name="plot${i}" class="color${i}" onchange="fetch_data('${x}', 'plot${i}')"}><label for=${x}>${x}</label><br>`;
+        list.innerHTML += `<input type="checkbox" name="plot${i}" class="color${j}" onchange="fetch_data('${x}', 'plot${i}')"}><label for=${x}>${x}</label><br>`;
         style.innerHTML += `#plot${i}{color: ${colors[j]};}`;
         ++i;
     }

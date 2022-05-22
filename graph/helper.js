@@ -4,8 +4,8 @@ let settings = {
   marginRight: 30, // right margin, in pixels
   marginBottom: 30, // bottom margin, in pixels
   marginLeft: 40, // left margin, in pixels
-  width: 640, // outer width, in pixels
-  height: 400, // outer height, in pixels
+  width: 800, // outer width, in pixels
+  height: 600, // outer height, in pixels
   color: "currentColor", // fill color of area
   id: "#chart",
 };
