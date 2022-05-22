@@ -10,7 +10,7 @@
 		<h2>Data</h2>
 		<form id="controls">
 		<input type="number" name="days" value=1><label name="days">days</label><br>
-		<input type="checkbox" onchange="fetch_data()" name="notes"><label name="notes">Show annotations?</label><br>
+		<!--input type="checkbox" name="notes"><label name="notes">Show annotations?</label><br-->
 		<h3>Topic</h3>
 		</form></div>
         <div id="chart">
@@ -18,19 +18,40 @@
     </body>
 </html>
 <script>
-function radio(data){
-  var list = document.getElementById("controls");
-  let i = 0;
-  for (let x in data){
-            ++i;
-		  list.innerHTML += `<input type="checkbox" name="plot${i}" onchange="fetch_data('${x}', 'plot${i}')"}><label for=${x}>${x}</label><br>`;
-  }
+
+function set_colors(colors){
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    let j = 0;
+    for (let x of colors){
+        style.innerHTML += `input[type="checkbox"]:checked.color${j}{box-shadow: inset 1em 1em ${x};}`;
+        ++j;
+    }
+    document.getElementsByTagName('head')[0].appendChild(style);
 }
+
+function radio(data){
+    var list = document.getElementById("controls");
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    let i = 0;
+    for (let x in data){
+        j = i%colors.length;
+        list.innerHTML += `<input type="checkbox" name="plot${i}" class="color${i}" onchange="fetch_data('${x}', 'plot${i}')"}><label for=${x}>${x}</label><br>`;
+        style.innerHTML += `#plot${i}{color: ${colors[j]};}`;
+        ++i;
+    }
+    document.getElementsByTagName('head')[0].appendChild(style);
+}
+
+colors = ["#1c71d8", "#2ec27e", "#e5a50a", "#e66100", "#8a3d9c"];
+set_colors(colors);
     
 fetch('/api/topics/').then(response => response.json() )
 .then(res => radio(res.topics))
 
 data = {}
+
 
 InitChart(settings);
 
