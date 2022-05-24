@@ -80,7 +80,6 @@ function addPlot(data, settings){
             .attr("id", data.i)
             .attr("fill", "none")
             .attr("d", make_line(data,settings))
-            .attr("stroke", settings.color)
             .attr("stroke-width", 1.5);
 }
 

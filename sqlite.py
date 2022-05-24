@@ -76,7 +76,7 @@ class db:
         for i in range(qty):
             if(rand.random() > 0.8):
                 x += rand.uniform(-0.2,0.5)
-            self.insert(topic, offset+math.cos(x), t+i)
+            self.insert(topic, offset+math.cos(x), t+i*300)
 
     def fetch(self, topic, end_date=None, days=1):
         timespan = days * 60*60*24

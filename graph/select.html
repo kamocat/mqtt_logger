@@ -78,16 +78,18 @@ function fetch_data(topic, index){
     }
 }
 
-function fetch_all(){
+async function fetch_all(){
     const controls = document.forms['controls'];
     let days = controls["days"].value;
     const topics = [];
     for (x in data){ topics.push(x); }
-    Promise.all(topics.map(topic => {
+    await Promise.all(topics.map(topic => {
         let url = "/api/points/" + topic + "?days=" + days;
         fetch(url).then(response => response.json())
         .then(response => {p = data[topic].i; data[topic]=response; data[topic].i = p;})
-    })).then(updateAll(data, settings));
+    }));
+    console.log("Days: " + days);
+    updateAll(data, settings);
 }
         
   
