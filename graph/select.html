@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="/helper.js"></script>
+<script src="helper.js"></script>
 <html>
-    <head><title>graphing test page</title>
+    <head><title>My IoT data</title>
     <style type="text/css">
 #chart {margin-left: 300px;}
 #sidebar {float: left; border: 1px solid gray; padding: 20px;}
@@ -11,8 +11,8 @@
     <body>
 	<div id="sidebar">
 		<h3>How many days?</h3>
-		<form id="controls">
-		<input type="number" name="days" value=1><label> days</label><br>
+		<form id="controls" onsubmit="event.preventDefault();">
+		<input type="number" name="days" value=1 onchange="fetch_all()"><label> days</label><br>
 		<!--input type="checkbox" name="notes"><label name="notes">Show annotations?</label><br-->
 		<h3>Which sensors?</h3>
 		</form></div>
@@ -77,5 +77,18 @@ function fetch_data(topic, index){
         updateAll(data, settings);
     }
 }
+
+function fetch_all(){
+    const controls = document.forms['controls'];
+    let days = controls["days"].value;
+    const topics = [];
+    for (x in data){ topics.push(x); }
+    Promise.all(topics.map(topic => {
+        let url = "/api/points/" + topic + "?days=" + days;
+        fetch(url).then(response => response.json())
+        .then(response => {p = data[topic].i; data[topic]=response; data[topic].i = p;})
+    })).then(updateAll(data, settings));
+}
+        
   
 </script> 
