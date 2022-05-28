@@ -87,9 +87,12 @@ class db:
             # Get the most recent point
             self.cur.execute('select end from num where topic=:n order by rowid desc limit 1',{'n':n})
             end_date = self.cur.fetchone()[0]
-        for row in self.cur.execute('select start,value from num where topic=:n and start<=:s and end>=:e',{'n':n, 's':end_date, 'e':end_date-timespan}):
+        for row in self.cur.execute('select start,value,end from num where topic=:n and start<=:s and end>=:e',{'n':n, 's':end_date, 'e':end_date-timespan}):
             x.append(row[0])
             y.append(row[1])
+            if(row[2] != row[0]): #Show the duration of the point
+                x.append(row[2])
+                y.append(row[1])
         return {"time":x, "value":y}
 
 
