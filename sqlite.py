@@ -15,19 +15,26 @@ class db:
             self.con.commit()
         except:
             pass
-    def match_topic(self, t):
+
+    def fetch_topic(self, t):
         # Check if the topic exists
         self.cur.execute("select id from topics where topic=:name",{"name":t})
         v = self.cur.fetchone()
         try:
             v = v[0]
         except:
+            v = -1
+        return v
+
+    def insert_topic(self, t):
+        n = self.fetch_topic(topic)
+        if n<1:
             # Insert the new topic
             self.cur.execute("insert into topics (topic) values (:n)", {"n":t})
             self.con.commit()
             # Get the index
-            v = self.cur.lastrowid
-        return v
+            n = self.cur.lastrowid
+        return n
 
     def insert(self, topic, data, t='now'):
         try:
@@ -35,10 +42,10 @@ class db:
         except:
             print(f"Could not convert to number: {data}")
             return
-        n = self.match_topic(topic)
         if( t == 'now' ):
             t = time.time()
         # Check if the value is the same
+        n = self.cur.insert_topic(topic)
         self.cur.execute('''select rowid,value from num 
         where topic=:n order by rowid desc''', {'n':n})
         tmp = self.cur.fetchone()
@@ -63,7 +70,7 @@ class db:
 
     def fill(self, topic, qty, clear=False):
         if( clear ):
-            n = self.match_topic(topic)
+            n = self.insert_topic(topic)
             self.cur.execute('delete from num where topic=:n',{'n':n})
 
         import random as rand
@@ -80,7 +87,7 @@ class db:
 
     def fetch(self, topic, end_date=None, days=1):
         timespan = days * 60*60*24
-        n = self.match_topic(topic)
+        n = self.fetch_topic(topic)
         x = []
         y = []
         if(end_date == None):
@@ -95,6 +102,11 @@ class db:
                 y.append(row[1])
         return {"time":x, "value":y}
 
-
+    def latest(self, topic):
+        n = self.fetch_topic(topic)
+        self.cur.execute('select start,end,value from num where topic=:n order by rowid desc limit 1',{'n':n})
+        res = self.cur.fetchone()
+        return {'start':res[0], 'end':res[1], 'value':res[2]}
+        
     def close(self):
         self.con.close()
