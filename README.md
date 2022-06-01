@@ -8,4 +8,4 @@ To view your data, start the server with `uvicorn main:app --reload` and navigat
 
 Lastly, configure your alerts and start with `python alert.py`
 
-If you're looking an mqtt server to test this out, (nanomq)[https://github.com/emqx/nanomq] is fast and requires no configuration.
+If you're looking an mqtt server to test this out, [nanomq](https://github.com/emqx/nanomq) is fast and requires no configuration.
