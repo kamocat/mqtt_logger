@@ -1,5 +1,6 @@
 import time
 import asyncio
+import mailjet
 class Alarm:
     def __init__(self, topic, notify, timeout=30):
         self.topic = topic
@@ -20,8 +21,7 @@ class Alarm:
         except: print(f'Warning: Test {test} does not accept numeric data')
         self.limits.append({'test':test, 'msg':msg, 'state':False})
     def send_alert(self, msg):
-        print(f'Sent alert to {self.notify}: {msg}')
-        #TODO: Send actual email
+        mailjet.send(msg, self.notify)
     def test(self, topic, value):
         if topic == self.topic:
             self.feed()
@@ -42,7 +42,7 @@ async def watchdog(topics):
             topic.watchdog()
         await asyncio.sleep(5)
 
-marshal = 'kamocat@gmail.com'
+marshal = "mhece.api@gmail.com"
 
 limits = []
 
