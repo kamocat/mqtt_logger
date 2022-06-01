@@ -26,11 +26,11 @@ class db:
             v = -1
         return v
 
-    def insert_topic(self, t):
+    def insert_topic(self, topic):
         n = self.fetch_topic(topic)
         if n<1:
             # Insert the new topic
-            self.cur.execute("insert into topics (topic) values (:n)", {"n":t})
+            self.cur.execute("insert into topics (topic) values (:n)", {"n":topic})
             self.con.commit()
             # Get the index
             n = self.cur.lastrowid
@@ -45,7 +45,7 @@ class db:
         if( t == 'now' ):
             t = time.time()
         # Check if the value is the same
-        n = self.cur.insert_topic(topic)
+        n = self.insert_topic(topic)
         self.cur.execute('''select rowid,value from num 
         where topic=:n order by rowid desc''', {'n':n})
         tmp = self.cur.fetchone()
