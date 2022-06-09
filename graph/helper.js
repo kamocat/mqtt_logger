@@ -1,88 +1,105 @@
-// Copyright 2021 Observable, Inc.
-// Released under the ISC license.
-// https://observablehq.com/@d3/area-chart
-function AreaChart(data, {
-  defined, // given d in data, returns true if defined (for gaps)
-  curve = d3.curveLinear, // method of interpolation between points
-  marginTop = 20, // top margin, in pixels
-  marginRight = 30, // right margin, in pixels
-  marginBottom = 30, // bottom margin, in pixels
-  marginLeft = 40, // left margin, in pixels
-  width = 640, // outer width, in pixels
-  height = 400, // outer height, in pixels
-  xType = d3.scaleTime, // type of x-scale
-  xDomain, // [xmin, xmax]
-  xRange = [marginLeft, width - marginRight], // [left, right]
-  yType = d3.scaleLinear, // type of y-scale
-  yDomain, // [ymin, ymax]
-  yRange = [height - marginBottom, marginTop], // [bottom, top]
-  yFormat, // a format specifier string for the y-axis
-  yLabel, // a label for the y-axis
-  color = "currentColor", // fill color of area
-  id= "div",
-} = {}) {
-  // Compute values.
-  const X = data.time.map(x=>x*1000);
-  const Y = data.value;
-  const I = d3.range(X.length);
+let settings = {
+  curve: d3.curveLinear, // method of interpolation between points
+  marginTop: 20, // top margin, in pixels
+  marginRight: 30, // right margin, in pixels
+  marginBottom: 30, // bottom margin, in pixels
+  marginLeft: 40, // left margin, in pixels
+  width: 800, // outer width, in pixels
+  height: 600, // outer height, in pixels
+  color: "currentColor", // fill color of area
+  id: "#chart",
+};
+function InitChart( conf ){
+	let div = d3.select(settings.id);
+    const svg = d3.create("svg")
+            .attr("width", conf.width)
+            .attr("height", conf.height)
+            .attr("viewBox", [0, 0, conf.width, conf.height])
+            .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+    
+    const xRange = [conf.marginLeft, conf.width - conf.marginRight]; // [left, right]
+    const yRange = [conf.height - conf.marginBottom, conf.marginTop]; // [bottom, top]
+    const domain = [-1,1];
+    const xScale = d3.scaleLinear(domain, xRange);
+    const yScale = d3.scaleLinear(domain, yRange);
+    const xAxis = d3.axisBottom(xScale).ticks(conf.width / 80).tickSizeOuter(0);
+    const yAxis = d3.axisLeft(yScale).ticks(conf.height / 40);
+    svg.append("g")
+            .attr("class", "yaxis")
+            .attr("transform", `translate(${conf.marginLeft},0)`)
+            .call(yAxis)
+    svg.append("g")
+            .attr("class", "xaxis")
+            .attr("transform", `translate(0,${conf.height - conf.marginBottom})`)
+            .call(xAxis);
+    div.node().append(svg.node());
+}
+function updateAxes(alldata, conf){
+    xRange = [conf.marginLeft, conf.width - conf.marginRight], // [left, right]
+    yRange = [conf.height - conf.marginBottom, conf.marginTop], // [bottom, top]
+                                                                       // Get min and max of x and y for all plots
+    x = [];
+    y = [];
+    for (d in alldata){
+        x.push(d3.min(alldata[d].time));
+        x.push(d3.max(alldata[d].time));
+        y.push(d3.min(alldata[d].value));
+        y.push(d3.max(alldata[d].value));
+    }
 
-  // Compute default domains.
-  if (xDomain === undefined) xDomain = d3.extent(X);
-  if (yDomain === undefined) yDomain = [d3.min(Y), d3.max(Y)];
+    // Compute default domains.
+    xDomain = [d3.min(x)*1000, d3.max(x)*1000];
+    yDomain = [d3.min(y), d3.max(y)];
 
-  // Construct scales and axes.
-  const xScale = xType(xDomain, xRange);
-  const yScale = yType(yDomain, yRange);
-  const xAxis = d3.axisBottom(xScale).ticks(width / 80).tickSizeOuter(0);
-  const yAxis = d3.axisLeft(yScale).ticks(height / 40, yFormat);
+    // Construct scales and axes.
+    conf.xScale = d3.scaleTime(xDomain, xRange);
+    conf.yScale = d3.scaleLinear(yDomain, yRange);
+    const xAxis = d3.axisBottom(conf.xScale).ticks(conf.width / 80).tickSizeOuter(0);
+    const yAxis = d3.axisLeft(conf.yScale).ticks(conf.height / 40);
 
-  // Construct an area generator.
-  const area = d3.line()
-      .curve(curve)
-      .x(i => xScale(X[i]))
-      .y(i => yScale(Y[i]));
+    svg = d3.select("svg")
+    svg = svg.transition().duration(750);
+    svg.select(".yaxis").call(yAxis);
+    svg.select(".xaxis").call(xAxis);
 
-	let div = d3.select(id);
-	if(AreaChart.didrun){
-		div = div.transition().duration(750);
-		div.select(".line").attr("d", area(I));
-		div.select(".yaxis").call(yAxis);
-		div.select(".xaxis").call(xAxis);
-	} else {
-		AreaChart.didrun = true;
-		const svg = d3.create("svg")
-				.attr("width", width)
-				.attr("height", height)
-				.attr("viewBox", [0, 0, width, height])
-				.attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+    // Fix the mapping on x axis
+    xDomain = [d3.min(x), d3.max(x)];
+    conf.xScale = d3.scaleTime(xDomain, xRange);
+    
+}
+function make_line(data, settings){
+    const I = d3.range(data.time.length);
+    let line = d3.line()
+      .curve(settings.curve)
+      .x(i => settings.xScale(data.time[i]))
+      .y(i => settings.yScale(data.value[i]));
+    return line(I);
+}
+function addPlot(data, settings){
+    d3.select("svg").append("path")
+            .attr("id", data.i)
+            .attr("fill", "none")
+            .attr("d", make_line(data,settings))
+            .attr("stroke-width", 1.5);
+}
 
-		svg.append("g")
-				.attr("class", "yaxis")
-				.attr("transform", `translate(${marginLeft},0)`)
-				.call(yAxis)
-				.call(g => g.select(".domain").remove())
-				.call(g => g.selectAll(".tick line").clone()
-						.attr("x2", width - marginLeft - marginRight)
-						.attr("stroke-opacity", 0.1))
-				.call(g => g.append("text")
-						.attr("x", -marginLeft)
-						.attr("y", 10)
-						.attr("fill", "currentColor")
-						.attr("text-anchor", "start")
-						.text(yLabel));
+function updatePlot(data, settings){
+    plot = d3.select("#"+ data.i);
+    if( plot.empty() ){
+        addPlot(data, settings);
+    } else {
+        plot
+            .transition().duration(750)
+            .attr("d", make_line(data,settings));
+    }
+}
 
-		svg.append("path")
-				.attr("class", "line")
-				.attr("fill", "none")
-				.attr("d", area(I))
-				.attr("stroke", color)
-				.attr("stroke-width", 1.5);
-
-		svg.append("g")
-				.attr("class", "xaxis")
-				.attr("transform", `translate(0,${height - marginBottom})`)
-				.call(xAxis);
-
-		div.node().append(svg.node());
-	}
+function updateAll(alldata, settings){
+    updateAxes(data, settings);
+    for (d in alldata){
+        updatePlot(alldata[d], settings);
+    }
+}
+function deletePlot(data, settings){
+        d3.select("#"+ data.i).remove();
 }

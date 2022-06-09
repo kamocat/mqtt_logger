@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="helper.js"></script>
+<html>
+    <head><title>My IoT data</title>
+    <style type="text/css">
+#chart {margin-left: 300px;}
+#sidebar {float: left; border: 1px solid gray; padding: 20px;}
+    </style>
+    </head>
+    <body>
+	<div id="sidebar">
+		<h3>How many days?</h3>
+		<form id="controls" onsubmit="event.preventDefault();">
+		<input type="number" name="days" value=1 onchange="fetch_all()"><label> days</label><br>
+		<!--input type="checkbox" name="notes"><label name="notes">Show annotations?</label><br-->
+		<h3>Which sensors?</h3>
+		</form></div>
+        <div id="chart">
+        </div>
+    </body>
+</html>
+<script>
+
+function set_colors(colors){
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    let j = 0;
+    for (let x of colors){
+        style.innerHTML += `input[type="checkbox"]:checked.color${j}{box-shadow: inset 1em 1em ${x};}`;
+        ++j;
+    }
+    document.getElementsByTagName('head')[0].appendChild(style);
+}
+
+function radio(data){
+    var list = document.getElementById("controls");
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    let i = 0;
+    for (let x in data){
+        j = i%colors.length;
+        list.innerHTML += `<input type="checkbox" name="plot${i}" class="color${j}" onchange="fetch_data('${x}', 'plot${i}')"}><label for=${x}>${x}</label><br>`;
+        style.innerHTML += `#plot${i}{color: ${colors[j]};}`;
+        ++i;
+    }
+    document.getElementsByTagName('head')[0].appendChild(style);
+}
+
+colors = ["#1c71d8", "#2ec27e", "#e5a50a", "#e66100", "#8a3d9c"];
+set_colors(colors);
+    
+fetch('/api/topics/').then(response => response.json() )
+.then(res => radio(res.topics))
+
+data = {}
+
+
+InitChart(settings);
+
+function fetch_data(topic, index){
+    const controls = document.forms['controls'];
+    if(controls[index].checked){
+        let url = "/api/points/" + topic + "?days=" + controls["days"].value;
+        fetch(url).then(response => response.json() )
+        .then(points => {
+            points.i=index; 
+            data[topic]=points;
+            return data;
+        })
+        .then(data => {
+            updateAll(data, settings);
+        })
+    } else {
+        deletePlot(data[topic], settings);
+        delete data[topic];
+        updateAll(data, settings);
+    }
+}
+
+async function fetch_all(){
+    const controls = document.forms['controls'];
+    let days = controls["days"].value;
+    const topics = [];
+    for (x in data){ topics.push(x); }
+    await Promise.all(topics.map(topic => {
+        let url = "/api/points/" + topic + "?days=" + days;
+        fetch(url).then(response => response.json())
+        .then(response => {p = data[topic].i; data[topic]=response; data[topic].i = p;})
+    }));
+    console.log("Days: " + days);
+    updateAll(data, settings);
+}
+        
+  
+</script> 
